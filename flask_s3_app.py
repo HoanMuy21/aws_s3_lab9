@@ -1,13 +1,12 @@
 from flask import Flask, request, jsonify
-import boto3
-import os
+import boto3, os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Cấu hình AWS S3 từ biến môi trường
 S3_BUCKET = os.getenv('S3_BUCKET')
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+
 s3_client = boto3.client(
     's3',
     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -21,19 +20,15 @@ def upload_file():
         return '''
         <h2>Upload file lên S3</h2>
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" required>
-            <br><br>
+            <input type="file" name="file" required><br><br>
             <button type="submit">Upload</button>
         </form>
         '''
 
-    if 'file' not in request.files:
-        return jsonify({'error': 'Không có phần tệp'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
+    if 'file' not in request.files or request.files['file'].filename == '':
         return jsonify({'error': 'Chưa chọn tệp'}), 400
 
+    file = request.files['file']
     filename = secure_filename(file.filename)
 
     try:
@@ -47,7 +42,7 @@ def upload_file():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/health', methods=['GET'])
+@app.route('/health')
 def health_check():
     return jsonify({'status': 'khỏe mạnh'}), 200
 
