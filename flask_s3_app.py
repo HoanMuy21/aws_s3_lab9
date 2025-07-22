@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+# Cấu hình S3 từ biến môi trường
 S3_BUCKET = os.getenv('S3_BUCKET')
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
 
@@ -14,6 +15,18 @@ s3_client = boto3.client(
     region_name=AWS_REGION
 )
 
+# Trang chủ
+@app.route('/')
+def index():
+    return '''
+    <h2>Chào mừng đến với Flask + AWS S3 App</h2>
+    <ul>
+        <li><a href="/upload">Tải tệp lên S3</a></li>
+        <li><a href="/health">Kiểm tra sức khỏe</a></li>
+    </ul>
+    '''
+
+# Upload file
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'GET':
@@ -42,9 +55,11 @@ def upload_file():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Kiểm tra sức khỏe ứng dụng
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'khỏe mạnh'}), 200
 
+# Chạy ứng dụng Flask
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
