@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flask-s3-app
-  labels:
-    app: flask-s3-app
 spec:
   replicas: 2
   selector:
@@ -33,14 +31,8 @@ spec:
         - name: S3_BUCKET
           value: "your-s3-bucket-name"
         - name: AWS_REGION
-          value: "us-east-1"
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "200m"
-            memory: "256Mi"
+          value: "ap-southeast-1"
+
 ---
 apiVersion: v1
 kind: Service
